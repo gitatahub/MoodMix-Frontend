@@ -1,41 +1,52 @@
 import { useState } from "react";
-import usePlaylists from "../../hooks/usePlaylists";
 
 export default function UploadTrackToPlaylist({
   playlistId,
+  playlistName,
+  onUpload,
 }: {
   playlistId: number;
+  playlistName: string;
+  onUpload: (playlistId: number, file: File) => void;
 }) {
-  const { uploadTrack } = usePlaylists(); // ✅ use hook function
   const [file, setFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
 
-  const handleUpload = async () => {
+  function handleUpload() {
     if (!file) return;
-    setUploading(true);
-    try {
-      await uploadTrack(playlistId, file); // ✅ hook updates playlists automatically
-      setFile(null);
-    } finally {
-      setUploading(false);
-    }
-  };
+    onUpload(playlistId, file);
+    setFile(null);
+  }
 
   return (
-    <div className="flex flex-col gap-2 p-4 bg-zinc-900 rounded-xl">
-      <input
-        type="file"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
-        className="text-sm"
-      />
+    <div className="flex flex-col gap-3 p-4 bg-zinc-900 rounded-xl">
+      <h2 className="text-xl font-semibold">Upload to: {playlistName}</h2>
+
+      {/* SELECT FILE BUTTON */}
+      <label className="bg-zinc-800 p-2 rounded cursor-pointer text-center">
+        Select File
+        <input 
+          type="file" 
+          className="hidden"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+        />
+      </label>
+
+      {/* SHOW SELECTED FILE NAME */}
+      {file && (
+        <p className="text-sm text-gray-300">
+          Selected: <span className="font-semibold">{file.name}</span>
+        </p>
+      )}
+
+      {/* UPLOAD BUTTON */}
       <button
         onClick={handleUpload}
-        disabled={uploading}
-        className={`p-2 rounded text-white ${
-          uploading ? "bg-gray-500" : "bg-green-500"
+        disabled={!file}
+        className={`px-4 py-2 rounded ${
+          file ? "bg-green-600" : "bg-gray-600 cursor-not-allowed"
         }`}
       >
-        {uploading ? "Uploading..." : "Upload Track"}
+        Upload
       </button>
     </div>
   );

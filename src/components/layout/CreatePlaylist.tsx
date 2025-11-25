@@ -1,31 +1,23 @@
 import { useState } from "react";
-import usePlaylists from "../../hooks/usePlaylists";
 
-export default function CreatePlaylist() {
-  const { addPlaylist } = usePlaylists(); // ✅ use hook function
+export default function CreatePlaylist({
+  onCreate,
+}: {
+  onCreate: (name: string, description: string) => void;
+}) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [creating, setCreating] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-
-    setCreating(true);
-    try {
-      await addPlaylist(name, description); // ✅ hook adds and updates state
-      setName("");
-      setDescription("");
-    } finally {
-      setCreating(false);
-    }
-  };
+    onCreate(name, description);
+    setName("");
+    setDescription("");
+  }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-2 p-4 bg-zinc-900 rounded-xl"
-    >
+    <form onSubmit={handleSubmit} className="flex gap-2">
       <input
         type="text"
         placeholder="Playlist name"
@@ -40,15 +32,7 @@ export default function CreatePlaylist() {
         onChange={(e) => setDescription(e.target.value)}
         className="p-2 rounded bg-zinc-800"
       />
-      <button
-        type="submit"
-        disabled={creating}
-        className={`p-2 rounded text-white ${
-          creating ? "bg-gray-500" : "bg-blue-500"
-        }`}
-      >
-        {creating ? "Creating..." : "Create Playlist"}
-      </button>
+      <button className="bg-blue-600 px-4 rounded">Create</button>
     </form>
   );
 }

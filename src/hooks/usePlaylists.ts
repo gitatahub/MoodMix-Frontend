@@ -12,7 +12,6 @@ export default function usePlaylists() {
   const [selected, setSelected] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Load all playlists when hook runs
   useEffect(() => {
     refreshPlaylists();
   }, []);
